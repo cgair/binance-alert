@@ -91,7 +91,7 @@ class UMWebsocketClient(object):
         if float(tx_price_h) > float(critical_price) and float(tx_price_l) < float(critical_price):
             content = CROSSING_FMT.format(symbol, critical_price)
             logging.debug(f"alerting message: {content}")
-            # send_msg(content)
+            send_msg(content)
 
 
 def start_websocket(

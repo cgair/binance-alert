@@ -4,6 +4,7 @@ apscheduler
 watchdog
 pytest
 toml
+demjson
 
 
 # __init__.py 文件作用是将文件夹变为一个Python模块 (通常__init__.py 文件为空)
