@@ -1,0 +1,17 @@
+# APP CONFIG
+
+[category]
+symbols = ["BTCUSDT", "ETHUSDT", "DOGEUSDT"]
+
+[specify]
+    [specify.symbol1]
+    symbol='ETHUSDT'
+    support_position=1500  # 支撑位 设置的支撑位要高于预期的支撑位
+    resistance_point=1625  # 阻力点 设置的阻力点要低于预期的阻力点
+    # volume=400    # 成交量
+
+    [specify.symbol2]
+    symbol='BTCUSDT'
+    # support_position=20001  # 支撑位 设置的支撑位要高于预期的支撑位
+    # resistance_point=21000  # 阻力点 设置的阻力点要低于预期的阻力点
+    # volume=400    # 成交量

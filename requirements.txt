@@ -1,0 +1,11 @@
+binance-futures-connector
+websocket-client
+apscheduler
+watchdog
+pytest
+toml
+
+
+# __init__.py 文件作用是将文件夹变为一个Python模块 (通常__init__.py 文件为空)
+# 我们在导入一个包时, 实际上是导入了它的__init__.py文件
+# 所以我们可以在__init__.py 文件中批量导入我们所需要的模块, 而不再需要一个一个的导入
