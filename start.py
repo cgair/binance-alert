@@ -32,7 +32,7 @@ def main():
     conf = config.Config()
     job(conf)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     config_logging(logging, logging.DEBUG)
-    # config_logging(logging, logging.INFO)
     main()

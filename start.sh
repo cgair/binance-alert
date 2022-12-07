@@ -18,8 +18,8 @@ do
     # 1. variable=`command`
     # 2. variable=$(command)
     task_pid=$(ps -ef | grep "$name" | grep -v grep | awk '{print $2}')
-    found=$(ps -ef | grep " $task_pid " | grep -v grep | awk '{print $2}')
-    echo 
+    found=$(ps -ef | grep " $task_pid " | grep -v grep | awk '{print $2}' | head -n 1)
+    echo "$found"
     # task_pid=$!
     while [ $found -gt 0 ]
     do
