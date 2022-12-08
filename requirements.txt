@@ -1,4 +1,4 @@
-binance-futures-connector
+# binance-futures-connector
 apscheduler
 watchdog
 pytest

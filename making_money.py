@@ -12,6 +12,7 @@ from dingding_client import send_msg, send_msg_at
 from start import CROSSING_FMT, VOLUME_FMT
 
 KLINE = 'wss://fstream.binance.com/ws/{}@kline_1m' # TODO interval should be configurable
+KLINE_URL = ""
 CONF = None
 SYMBOL = ""
 reconnect_count = 0
@@ -23,9 +24,10 @@ def start_websocket(
     conf,
     symbol
     ):
-    kline_url = KLINE.format(symbol.lower())
+    global KLINE_URL
+    KLINE_URL = KLINE.format(symbol.lower())
     _set_global(conf, symbol)
-    start(kline_url)
+    start(KLINE_URL)
 
 
 def on_message(ws, message):
@@ -45,10 +47,10 @@ def on_message(ws, message):
             support_position = value['support_position'] if 'support_position' in value.keys() else None
             resistance_point = value['resistance_point'] if 'resistance_point' in value.keys() else None
             volume = value['volume'] if 'volume' in value.keys() else None
-            logging.debug(f"CONFIG: symbol = {sb}, support_position = {support_position}, resistance_point = {resistance_point}, volume = {volume}")
+            # logging.debug(f"CONFIG: symbol = {sb}, support_position = {support_position}, resistance_point = {resistance_point}, volume = {volume}")
     
-    import time
-    time.sleep(3)
+    # import time   # Only for debug
+    # time.sleep(3)
 
     message = demjson.decode(message)
     logging.debug(f"RCVD: {message}")
@@ -70,6 +72,8 @@ def on_close(ws, close_status_code, close_msg):
         The 3rd argument is close_msg.
     """
     logging.debug(f"CLOSED: {close_status_code} - {close_msg}")
+    global KLINE_URL
+    start(KLINE_URL)
 
 
 def on_error(ws, error):
@@ -80,12 +84,12 @@ def on_error(ws, error):
         The 1st argument is this class object.
         The 2nd argument is exception object.
     """
-    global reconnect_count
+    global reconnect_count, KLINE_URL
     if type(error)==ConnectionRefusedError or type(error)==websocket._exceptions.WebSocketConnectionClosedException:
         logging.info(f"Attempting to reconnect {reconnect_count}")
         reconnect_count += 1
         if reconnect_count < 100:
-            start()
+            start(KLINE_URL)
     else:
         logging.error("encounter other error!")
 
@@ -94,6 +98,7 @@ def start(url):
     ws = websocket.WebSocketApp(
             url,
             on_message=on_message,
+            on_error=on_error,
             on_close=on_close)
 
     try:
@@ -102,6 +107,9 @@ def start(url):
         ws.close()  
     except:
         ws.close() 
+
+    # work around https://github.com/websocket-client/websocket-client/issues/777
+    # ws.run_forever(dispatcher=rel, reconnect=5)  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly
 
 
 def _set_global(conf, symbol):

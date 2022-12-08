@@ -7,12 +7,12 @@ symbols = ["BTCUSDT", "ETHUSDT", "DOGEUSDT"]
 [specify]
     [specify.symbol1]
     symbol='ETHUSDT'
-    support_position=1460  # 支撑位 设置的支撑位要高于预期的支撑位
-    resistance_point=1590  # 阻力点 设置的阻力点要低于预期的阻力点
+    support_position=1218  # 支撑位 设置的支撑位要高于预期的支撑位
+    resistance_point=1239  # 阻力点 设置的阻力点要低于预期的阻力点
     # volume=400    # 成交量
 
     [specify.symbol2]
     symbol='BTCUSDT'
-    support_position=20114  # 支撑位 设置的支撑位要高于预期的支撑位
+    support_position=16790  # 支撑位 设置的支撑位要高于预期的支撑位
     resistance_point=20660  # 阻力点 设置的阻力点要低于预期的阻力点
     # volume=400    # 成交量

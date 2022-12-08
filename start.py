@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import logging
 import threading
-
-from binance.lib.utils import config_logging
+import rel
 
 from making_money import *
 from dingding_client import send_msg
 from utils import *
 # from config import Config
 import config
+
 
 # SYMBOLS=["BTCUSDT", "ETHUSDT", "DOGEUSDT"]
 QUOTATION_FMT="-------------------------\n[{}]\n{}: ${} U\n时间: {}\n过去1天的涨跌幅: {:.2%}\n"
@@ -34,5 +34,5 @@ def main():
 
 
 if __name__ == "__main__":
-    config_logging(logging, logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s %(message)s')
     main()
