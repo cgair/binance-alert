@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import logging
 import threading
-import rel
 
 from making_money import *
 from dingding_client import send_msg
@@ -34,5 +33,5 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(format='%(asctime)s %(message)s')
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
     main()

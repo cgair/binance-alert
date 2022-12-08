@@ -3,22 +3,56 @@
 # [python-binance](https://python-binance.readthedocs.io/en/latest/overview.html)
 
 from flask import Flask, request
-from binance.client import Client
+import json
+import toml
 
-API_KEYS = {"lys": "EiBHoUOBSY2Ou9UekpxlhVslkxbSpsC71Z7HsGyJamDEitRkOn2HSc0QTcQsqNzo", "cg": ""}
-API_SECRET = {"lys": "98jHttnRipKiH31X2KjnXe0eUmXLJOOzPOPDOByZsUZ4w2cln5qkvPAYSZ4JBQ2H", "cg": ""}
+CONFIG_PATH="./config/config.toml"
+CONFIG=None
 
 app = Flask(__name__)
 
+##################################################################
+# Call xiaomi to modify the configuration (i.e., position prices)#
+##################################################################
 @app.route("/call", methods=['POST'])
 def call():
+    global CONFIG
     if request.method == 'POST':
         content = request.get_json().get('text').get('content')
-        app.logger.debug(content)
+        conf_dict = json.loads(content)
+        app.logger.debug(conf_dict)
+
+        for symbol in conf_dict.keys():
+            if symbol in CONFIG['category']['symbols']:
+                for symboli in CONFIG['specify'].keys():
+                    if symbol == CONFIG['specify'][symboli]["symbol"]:
+                        CONFIG['specify'][symboli]['support_position'] = conf_dict[symbol]["支撑位"]
+                        CONFIG['specify'][symboli]['resistance_point'] = conf_dict[symbol]["阻力位"]
+            else:
+                CONFIG['category']['symbols'].append(symbol)
+                sum_symbol = len(CONFIG['specify'])
+                new_symbol = "symbol{}".format(str(sum_symbol + 1))
+                CONFIG['specify'][new_symbol] = {'symbol': new_symbol, 'support_position': conf_dict[symbol]["支撑位"], 'resistance_point': conf_dict[symbol]["阻力位"]}
+        try:
+            with open(CONFIG_PATH, 'w') as f:
+                print(CONFIG)
+                r = toml.dump(CONFIG, f)
+                app.logger.error(r)
+        except:
+            msg = {
+                "msgtype": "text",
+                "text": {
+                    "content": "配置文件更新发送错误: {}".format(r)
+                    },             
+                "at": {
+                    "atMobiles": [],
+                    "isAtAll": False
+                    }         
+                }        
         msg = {
             "msgtype": "text",
             "text": {
-                "content": "你说的是:  {0}".format(content)             
+                "content": "配置文件已经更新成功"            
                 },             
             "at": {
                 "atMobiles": [],
@@ -30,7 +64,7 @@ def call():
         return {
             "msgtype": "text",
             "text": {
-                "content": "GET"             
+                "content": "不支持 GET"             
                 },             
             "at": {
                 "atMobiles": [],
@@ -38,29 +72,7 @@ def call():
                 }         
             }        
 
-##################################################################
-# Convert a Python double/float into an ES6/V8 compatible string #
-##################################################################
-class Account:
-    """
-    
-    """
-    def __init__(
-        self,
-        client
-        ):
-        self.client = client
-
-    """https://python-binance.readthedocs.io/en/latest/account.html#id8
-    """
-    def account_info(self):
-        info = client.get_account()
-        print(info)
-
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=8888, debug=True)
-    client = Client(API_KEYS["lys"], API_SECRET["lys"])
-
-    res = client.get_account()
-    print(client.response)
+    CONFIG = toml.load(CONFIG_PATH)
+    app.run(host='0.0.0.0', port=8888, debug=True)
