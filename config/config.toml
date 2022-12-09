@@ -1,10 +1,10 @@
 [category]
-symbols = [ "BTCUSDT", "ETHUSDT", "DOGEUSDT",]
+symbols = [ "BTCUSDT", "ETHUSDT"]
 
 [specify.symbol1]
 symbol = "ETHUSDT"
 support_position = 1218
-resistance_point = 1240
+resistance_point = 1280
 
 [specify.symbol2]
 symbol = "BTCUSDT"

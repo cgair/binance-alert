@@ -14,7 +14,7 @@ from start import CROSSING_FMT, VOLUME_FMT
 KLINE = 'wss://fstream.binance.com/ws/{}@kline_1m' # TODO interval should be configurable
 KLINE_URL = ""
 CONF = None
-SYMBOL = ""
+SYMBOL = []
 reconnect_count = 0
 
 #################################################
@@ -43,11 +43,11 @@ def on_message(ws, message):
     config = CONF.config['specify']
     for value in config.values():
         sb = value['symbol'] if 'symbol' in value.keys() else 'ETHUSDT'
-        if sb == SYMBOL:
+        if sb in SYMBOL:
             support_position = value['support_position'] if 'support_position' in value.keys() else None
             resistance_point = value['resistance_point'] if 'resistance_point' in value.keys() else None
             volume = value['volume'] if 'volume' in value.keys() else None
-            # logging.debug(f"CONFIG: symbol = {sb}, support_position = {support_position}, resistance_point = {resistance_point}, volume = {volume}")
+            logging.debug(f"CONFIG: symbol = {sb}, support_position = {support_position}, resistance_point = {resistance_point}, volume = {volume}")        
     
     # import time   # Only for debug
     # time.sleep(3)
@@ -115,7 +115,7 @@ def start(url):
 def _set_global(conf, symbol):
     global CONF, SYMBOL
     CONF = conf
-    SYMBOL = symbol
+    SYMBOL.append(symbol)
 
 
 def _is_surpassing(message, volume):
