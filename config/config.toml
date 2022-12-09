@@ -4,7 +4,7 @@ symbols = [ "BTCUSDT", "ETHUSDT"]
 [specify.symbol1]
 symbol = "ETHUSDT"
 support_position = 1218
-resistance_point = 1280
+resistance_point = 1281
 
 [specify.symbol2]
 symbol = "BTCUSDT"

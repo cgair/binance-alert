@@ -12,9 +12,8 @@ from dingding_client import send_msg, send_msg_at
 from start import CROSSING_FMT, VOLUME_FMT
 
 KLINE = 'wss://fstream.binance.com/ws/{}@kline_1m' # TODO interval should be configurable
-KLINE_URL = ""
 CONF = None
-SYMBOL = []
+SYMBOLS = []
 reconnect_count = 0
 
 #################################################
@@ -25,9 +24,9 @@ def start_websocket(
     symbol
     ):
     global KLINE_URL
-    KLINE_URL = KLINE.format(symbol.lower())
+    kline_url = KLINE.format(symbol.lower())
     _set_global(conf, symbol)
-    start(KLINE_URL)
+    start(kline_url)
 
 
 def on_message(ws, message):
@@ -38,28 +37,25 @@ def on_message(ws, message):
         The 1st argument is this class object.
         The 2nd argument is utf-8 data received from the server.
     """
+    message = demjson.decode(message)
+    logging.debug(f"RCVD: {message}")
     global CONF
-    global SYMBOL
+    global SYMBOLS
     config = CONF.config['specify']
     for value in config.values():
         sb = value['symbol'] if 'symbol' in value.keys() else 'ETHUSDT'
-        if sb in SYMBOL:
+        if sb in SYMBOLS:
             support_position = value['support_position'] if 'support_position' in value.keys() else None
             resistance_point = value['resistance_point'] if 'resistance_point' in value.keys() else None
             volume = value['volume'] if 'volume' in value.keys() else None
             logging.debug(f"CONFIG: symbol = {sb}, support_position = {support_position}, resistance_point = {resistance_point}, volume = {volume}")        
-    
-    # import time   # Only for debug
-    # time.sleep(3)
 
-    message = demjson.decode(message)
-    logging.debug(f"RCVD: {message}")
-    if resistance_point:
-        _is_crossing(message, resistance_point)
-    if support_position:
-        _is_crossing(message, support_position)
-    if volume:
-        _is_surpassing(message, volume)
+            if resistance_point:
+                _is_crossing(message, resistance_point)
+            if support_position:
+                _is_crossing(message, support_position)
+            if volume:
+                _is_surpassing(message, volume)
 
 
 def on_close(ws, close_status_code, close_msg):
@@ -113,9 +109,9 @@ def start(url):
 
 
 def _set_global(conf, symbol):
-    global CONF, SYMBOL
+    global CONF, SYMBOLS
     CONF = conf
-    SYMBOL.append(symbol)
+    SYMBOLS.append(symbol)
 
 
 def _is_surpassing(message, volume):
