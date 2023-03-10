@@ -1,12 +1,12 @@
 [category]
-symbols = [ "BTCUSDT", "ETHUSDT"]
+symbols = [ "BTCUSDT", "ETHUSDT",]
 
 [specify.symbol1]
 symbol = "ETHUSDT"
-support_position = 1218
-resistance_point = 1281
+support_position = 1150
+resistance_point = 1225
 
 [specify.symbol2]
 symbol = "BTCUSDT"
-support_position = 16690
-resistance_point = 30000
+support_position = 17300
+resistance_point = 16500

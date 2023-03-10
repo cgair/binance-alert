@@ -14,6 +14,7 @@ from start import CROSSING_FMT, VOLUME_FMT
 KLINE = 'wss://fstream.binance.com/ws/{}@kline_1m' # TODO interval should be configurable
 CONF = None
 SYMBOLS = []
+RECONNECT_SYMBOLS = []
 reconnect_count = 0
 
 #################################################
@@ -23,7 +24,6 @@ def start_websocket(
     conf,
     symbol
     ):
-    global KLINE_URL
     kline_url = KLINE.format(symbol.lower())
     _set_global(conf, symbol)
     start(kline_url)
@@ -39,8 +39,8 @@ def on_message(ws, message):
     """
     message = demjson.decode(message)
     logging.debug(f"RCVD: {message}")
-    global CONF
-    global SYMBOLS
+    global CONF, SYMBOLS
+
     config = CONF.config['specify']
     for value in config.values():
         sb = value['symbol'] if 'symbol' in value.keys() else 'ETHUSDT'
@@ -56,7 +56,8 @@ def on_message(ws, message):
                 _is_crossing(message, support_position)
             if volume:
                 _is_surpassing(message, volume)
-
+        else:
+            pass    # add new symbol in SYMBOLS & RECONNECT_SYMBOLS
 
 def on_close(ws, close_status_code, close_msg):
     """
@@ -68,8 +69,6 @@ def on_close(ws, close_status_code, close_msg):
         The 3rd argument is close_msg.
     """
     logging.debug(f"CLOSED: {close_status_code} - {close_msg}")
-    global KLINE_URL
-    start(KLINE_URL)
 
 
 def on_error(ws, error):
@@ -80,14 +79,19 @@ def on_error(ws, error):
         The 1st argument is this class object.
         The 2nd argument is exception object.
     """
-    global reconnect_count, KLINE_URL
+    global reconnect_count, RECONNECT_SYMBOLS
     if type(error)==ConnectionRefusedError or type(error)==websocket._exceptions.WebSocketConnectionClosedException:
-        logging.info(f"Attempting to reconnect {reconnect_count}")
+        logging.info(f"NOTE: Attempting to reconnect {reconnect_count}")
         reconnect_count += 1
-        if reconnect_count < 100:
-            start(KLINE_URL)
+        for s in RECONNECT_SYMBOLS:
+            kline_url = KLINE.format(s.lower())
+            start(kline_url)
+            RECONNECT_SYMBOLS.remove(s)
+
+        if reconnect_count > 100:
+            logging.error(f"ERROR: loop exceed {reconnect_count}")
     else:
-        logging.error("encounter other error!")
+        logging.error("ERROR: encounter other error!")
 
 
 def start(url):
@@ -109,9 +113,10 @@ def start(url):
 
 
 def _set_global(conf, symbol):
-    global CONF, SYMBOLS
+    global CONF, SYMBOLS, RECONNECT_SYMBOLS
     CONF = conf
     SYMBOLS.append(symbol)
+    RECONNECT_SYMBOLS.append(symbol)
 
 
 def _is_surpassing(message, volume):
